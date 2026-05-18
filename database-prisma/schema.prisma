@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  DRIVER
+  CUSTOMER
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String    // Hashed password
+  name      String
+  role      UserRole  @default(CUSTOMER)
+  phone     String?
+  avatarUrl String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relationships
+  assignedTasks Parcel[] @relation("DriverParcels")
+  myParcels     Parcel[] @relation("CustomerParcels")
+
+  @@map("users")
+}
+
+model Parcel {
+  id          String   @id // e.g. "PK-10582"
+  items       String   // e.g. "Noise-Canceling Headphones, Sneakers"
+  value       Decimal  @db.Decimal(10, 2)
+  status      String   // "Pending", "In Transit", "Out for Delivery", "Delivered"
+  receiver    String
+  phone       String
+  destination String
+  origin      String
+  pin         String   // Secure 4-digit handover PIN (e.g. "8902")
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Foreign keys
+  driverId    Int?
+  customerId  Int?
+
+  // Relations
+  driver      User?           @relation("DriverParcels", fields: [driverId], references: [id])
+  customer    User?           @relation("CustomerParcels", fields: [customerId], references: [id])
+  timeline    TimelineEvent[]
+
+  @@index([driverId])
+  @@index([customerId])
+  @@map("parcels")
+}
+
+model TimelineEvent {
+  id          Int      @id @default(autoincrement())
+  parcelId    String
+  status      String   // "Pending", "In Transit", "Out for Delivery", "Delivered"
+  description String   // e.g. "Order received" or "Assigned to driver Sarah Jenkins"
+  timestamp   DateTime @default(now())
+
+  // Relations
+  parcel      Parcel   @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+
+  @@index([parcelId])
+  @@map("timeline_events")
+}

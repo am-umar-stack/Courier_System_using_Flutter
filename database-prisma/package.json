@@ -1,0 +1,11 @@
+{
+  "name": "amu-courier-database",
+  "version": "1.0.0",
+  "description": "AMU Courier Relational Database Schema Layer",
+  "dependencies": {
+    "@prisma/client": "^5.10.2"
+  },
+  "devDependencies": {
+    "prisma": "^5.10.2"
+  }
+}

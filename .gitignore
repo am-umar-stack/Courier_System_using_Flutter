@@ -1,0 +1,18 @@
+# Local build directories
+**/build/
+**/.dart_tool/
+**/node_modules/
+**/dist/
+
+# Local configuration files (keeps your local MySQL password secure!)
+**/.env
+**/.env.local
+
+# Editor configurations
+**/.idea/
+**/.vscode/
+**/*.iml
+
+# System specific files
+.DS_Store
+Thumbs.db
